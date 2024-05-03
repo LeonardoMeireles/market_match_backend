@@ -1,0 +1,92 @@
+name: US CI/CD Pipeline
+
+on:
+  push:
+    tags: [poc-*-v*]
+
+env:
+  AWS_ECR_APP_NAME: sandbox-backend
+  AWS_REGION: us-east-2
+  AWS_ACCOUNT_US_APPS_STAGING: 236579017311
+  IMAGE_TAG: ${{ github.sha }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+jobs:
+  test-image:
+    name: Test Image
+    environment: Testing
+    runs-on: [ self-hosted, linux, staging, apps ]
+    steps:
+      - name: Cleanup Everything
+        uses: colpal/actions-clean@v1
+
+      - name: Get Code
+        uses: actions/checkout@v2
+
+      #      - name: Create Coverage Dir
+      #        run: mkdir ${{ github.workspace }}/coverage
+      #
+      #      - name: SonarCloud Scan
+      #        uses: sonarsource/sonarcloud-github-action@master
+      #        continue-on-error: true #TODO: revert this once sonarcloud integration works properly
+
+      - name: Cleanup Everything
+        uses: colpal/actions-clean@v1
+        if: ${{ always() }}
+
+  build-image:
+    name: Build Image
+    runs-on: [ self-hosted, linux, staging, apps ]
+    needs:
+      - test-image
+    steps:
+      - name: Cleanup Everything
+        uses: colpal/actions-clean@v1
+
+      - name: Get Code
+        uses: actions/checkout@v2
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build Docker image for application
+        uses: docker/build-push-action@v2
+        with:
+          build-args: NPM_AUTH_TOKEN=${{ secrets.NPM_AUTH_TOKEN }}
+          push: true
+          context: .
+          tags: |
+            ${{ env.AWS_ACCOUNT_US_APPS_STAGING }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.AWS_ECR_APP_NAME }}:${{ env.IMAGE_TAG }}
+
+      - name: Cleanup Everything
+        uses: colpal/actions-clean@v1
+        if: ${{ always() }}
+  deploy-image:
+    name: Deploy Staging
+    environment: Staging
+    runs-on: [ self-hosted, linux, staging, apps ]
+    needs:
+      - build-image
+    env:
+      EKS_CLUSTER_NAME: agoro-apps-staging
+    steps:
+      - name: Cleanup Everything
+        uses: colpal/actions-clean@v1
+
+      - name: Get Code
+        uses: actions/checkout@v2
+
+      - name: Get Kuberentes Config
+        run: aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+
+      - name: Helmfile Diff
+        run: |
+          cd infra
+          ECR_AGORO_REPOSITORY=${{ env.AWS_ACCOUNT_US_APPS_STAGING }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com helmfile --environment stage diff
+
+      - name: Helmfile Deploy
+        run: |
+          cd infra
+          ECR_AGORO_REPOSITORY=${{ env.AWS_ACCOUNT_US_APPS_STAGING }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com helmfile --environment stage apply --suppress-secrets
