@@ -1,6 +1,4 @@
-import {registerAs} from "@nestjs/config";
-import {UserEntity} from "../database/entities/user.entity";
-import {UserMigration1653653980931 as UserMigration} from "../database/migrations/1653653980931UserMigration";
+import { registerAs } from '@nestjs/config';
 
 export default registerAs('postgresConfig', () => {
   return {
@@ -11,12 +9,14 @@ export default registerAs('postgresConfig', () => {
     password: process.env.TYPEORM_PASSWORD,
     database: process.env.TYPEORM_DATABASE,
     autoLoadEntities: true,
-    entities: [UserEntity],
-    migrations: [UserMigration],
+    entities: [
+      'src/product/entities/*.ts',
+      'src/supermarket/entities/*.ts',
+    ],
+    migrations: [],
     synchronize: true,
     cli: {
-      entitiesDir: "src/database/entities",
-      migrationsDir: "src/database/migrations"
+      migrationsDir: 'src/database/migrations'
     }
-  }
-})
+  };
+});
