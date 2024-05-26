@@ -1,24 +1,13 @@
-import { Column, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Supermarket } from '../../supermarket/entities/supermarket.entity';
-import { JoinTable } from 'typeorm/browser';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
 
+@Entity('product')
 export class Product {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @ManyToOne((type) => Supermarket)
-  @JoinTable({name: 'market_id'})
-  market: Supermarket;
-
-  @Column()
+  @PrimaryColumn()
   ean: string;
 
-  @Column({ default: true })
+  @Column()
   name: string;
 
-  @Column()
+  @Column({nullable: true})
   description: string;
-
-  @Column()
-  price: number;
 }

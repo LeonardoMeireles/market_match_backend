@@ -2,10 +2,12 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { SupermarketService } from './supermarket.service';
 import { CreateSupermarketDto } from './dto/create-supermarket.dto';
 import { UpdateSupermarketDto } from './dto/update-supermarket.dto';
+import { FindMarketMatchDto } from '../shopping-list/dto/find-market-match.dto';
 
 @Controller('supermarket')
 export class SupermarketController {
-  constructor(private readonly supermarketService: SupermarketService) {}
+  constructor(private readonly supermarketService: SupermarketService) {
+  }
 
   @Post()
   create(@Body() createSupermarketDto: CreateSupermarketDto) {
@@ -20,6 +22,11 @@ export class SupermarketController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.supermarketService.findOne(+id);
+  }
+
+  @Post('/market-match') //TODO: change to DTO
+  async findMarketMatch(@Body() findMarketMatchDto: FindMarketMatchDto) {
+    return await this.supermarketService.findMarketMatch(findMarketMatchDto);
   }
 
   @Patch(':id')

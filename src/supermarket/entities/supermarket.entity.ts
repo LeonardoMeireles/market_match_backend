@@ -1,9 +1,10 @@
-import { Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Point } from 'geojson';
 
+@Entity('supermarket')
 export class Supermarket {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column()
   name: string;
@@ -11,7 +12,7 @@ export class Supermarket {
   @Column()
   url: string;
 
-  @Column()
+  @Column({nullable: true})
   zip_code: string;
 
   @Column()
@@ -25,15 +26,15 @@ export class Supermarket {
 
   @Column({
     type: 'geometry',
-    spatialFeatureType: 'LineString',
+    spatialFeatureType: 'Point',
     srid: 4326,
   })
   coordinate_geom: Point;
 
-  @Column()
+  @Column({nullable: true})
   cnpj: string;
 
-  @Column()
+  @Column('numeric', {nullable: true})
   delivery_price: number;
 
   @Column()

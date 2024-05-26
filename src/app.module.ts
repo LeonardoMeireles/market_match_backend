@@ -9,6 +9,9 @@ import { ProductModule } from './product/product.module';
 import { SupermarketModule } from './supermarket/supermarket.module';
 
 import postgresConfig from './config/postgres.config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserModule } from './user/user.module';
+import { ShoppingListModule } from './shopping-list/shopping-list.module';
 
 @Module({
   imports: [
@@ -16,11 +19,14 @@ import postgresConfig from './config/postgres.config';
     AuthorizationModule,
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [postgresConfig]
+      envFilePath: ['.env'],
+      load: [postgresConfig],
     }),
     ...PostgresModule.forRoot(process.env.ENABLED_DB),
     ProductModule,
     SupermarketModule,
+    UserModule,
+    ShoppingListModule,
   ],
   controllers: [AppController],
   providers: [AppService],
