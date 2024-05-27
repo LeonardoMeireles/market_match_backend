@@ -40,8 +40,8 @@ export class ShoppingListService {
     return `This action returns a #${id} shoppingList`;
   }
 
-  getProductsFromList(listId: string) {
-    return this.shoppingListItemRepository.find({
+  async getProductsFromList(listId: string) {
+    return await this.shoppingListItemRepository.find({
       select: ['product'],
       relations: ['product'],
       where: {listId}
@@ -53,8 +53,8 @@ export class ShoppingListService {
     return this.productRepository.findOne(addProductToListDto.ean);
   }
 
-  removeFromList(removeProductFromListDto: EditShoppingListProduct) {
-    return this.shoppingListItemRepository.delete({
+  async removeFromList(removeProductFromListDto: EditShoppingListProduct) {
+    return await this.shoppingListItemRepository.delete({
       listId: removeProductFromListDto.listId,
       ean: removeProductFromListDto.ean
     });

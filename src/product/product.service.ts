@@ -17,13 +17,16 @@ export class ProductService {
     return 'This action adds a new product';
   }
 
-  findPaginated(page?: number, name?: string) {
+  async findPaginated(page?: number, name?: string) {
     const pageSize = 50;
-    return this.productRepository.findAndCount({
-      where: {name: ILike(`%${name}%`)},
+    let where = {};
+    if (name) where = {name: ILike(`%${name}%`)};
+    const res = await this.productRepository.findAndCount({
+      where,
       take: pageSize,
       skip: pageSize * (page ?? 0)
     });
+    return res[0];
   }
 
   async findAll(name?: string) {

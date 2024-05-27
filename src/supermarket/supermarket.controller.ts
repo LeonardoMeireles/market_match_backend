@@ -24,7 +24,7 @@ export class SupermarketController {
     return this.supermarketService.findOne(+id);
   }
 
-  @Post('/market-match') //TODO: change to DTO
+  @Post('/market-match')
   async findMarketMatch(@Body() findMarketMatchDto: FindMarketMatchDto) {
     return await this.supermarketService.findMarketMatch(findMarketMatchDto);
   }

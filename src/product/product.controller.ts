@@ -22,11 +22,11 @@ export class ProductController {
   }
 
   @Get('/paginated')
-  findPaginated(
+  async findPaginated(
     @Query('name') name?: string,
     @Query('page') page?: number,
   ) {
-    return this.productService.findPaginated(page, name);
+    return await this.productService.findPaginated(page, name);
   }
 
   @Get(':id')

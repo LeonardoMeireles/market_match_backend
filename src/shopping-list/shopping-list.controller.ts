@@ -22,7 +22,6 @@ export class ShoppingListController {
 
   @Get('/user/:userId')
   async findAllUser(@Param('userId') userId: string) {
-    console.log('GOT CALLED');
     return await this.shoppingListService.findAllUser(userId);
   }
 
@@ -33,7 +32,7 @@ export class ShoppingListController {
 
   @Get('/list-products/:listId')
   async getProductsFromList(@Param('listId') listId: string) {
-    return this.shoppingListService.getProductsFromList(listId);
+    return await this.shoppingListService.getProductsFromList(listId);
   }
 
   @Post('/add-to-list')
@@ -46,7 +45,7 @@ export class ShoppingListController {
     return this.shoppingListService.update(+id, updateShoppingListDto);
   }
 
-  @Delete('/remove-product')
+  @Post('/remove-product')
   async removeFromList(@Body() editShoppingListProduct: EditShoppingListProduct) {
     return await this.shoppingListService.removeFromList(editShoppingListProduct);
   }
